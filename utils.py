@@ -1,30 +1,37 @@
-# utils.py
-
-import requests
 import json
+import requests
 
-def get_market_data():
+API_BASE_URL = "https://api.limitless.exchange"
+
+
+def get_daily_markets(page: int = 1, limit: int = 100):
     """
-    Get market data for the daily category
+    Fetch all active markets and filter for Daily markets with tokens.
     """
     response = requests.get(
-        "https://api.limitless.exchange/markets/active/30",
-        params={
-          "page": "1",
-          "limit": "10",
-          "sortBy": "newest"
-        }
+        f"{API_BASE_URL}/markets/active",
+        params={"sortBy": "newest"},
     )
+    response.raise_for_status()
+    data = response.json()
 
-    return response.json()
+    # Filter for markets that are Daily and have tokens
+    daily_markets = [
+        market
+        for market in data.get("data", [])
+        if "Daily" in market.get("categories", []) and market.get("tokens")
+    ]
 
-market_data = get_market_data()
+    return daily_markets
 
-# Find a market with tokens
-# Some markets do not have tokens, so we need to check for that
-for item in market_data.get("data"):
-  if item.get("tokens"):
-    print(item.get("slug"))
-    print(json.dumps(item.get("tokens"), indent=2))
-    print(item.get("prices"))
-    break
+
+# Example usage
+daily_markets = get_daily_markets()
+
+if daily_markets:
+    market = daily_markets[0]
+    print(market.get("slug"))
+    print(json.dumps(market.get("tokens"), indent=2))
+    print(market.get("prices"))
+else:
+    print("No Daily markets with tokens found.")

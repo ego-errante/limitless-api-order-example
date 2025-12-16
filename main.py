@@ -276,6 +276,10 @@ def create_signature_for_order_payload(market_type, order_payload, private_key):
     # Extract signature
     signature = signed_message.signature.hex()
 
+    # Ensure single 0x prefix regardless of how .hex() behaves
+    if not signature.startswith("0x"):
+        signature = "0x" + signature
+
     print(f"Successfully generated EIP-712 Signature: {signature}")
     return signature
 
