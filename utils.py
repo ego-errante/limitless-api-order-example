@@ -31,6 +31,7 @@ daily_markets = get_daily_markets()
 if daily_markets:
     market = daily_markets[0]
     print(market.get("slug"))
+    print(market.get("venue"))
     print(json.dumps(market.get("tokens"), indent=2))
     print(market.get("prices"))
 else:
